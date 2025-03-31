@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scary Stories Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        h1 {
+            text-align: center;
+        }
+        canvas {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: block;
+        }
+        .post-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .post {
+            width: 45%;
+            margin: 10px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+        }
+        .post h3 {
+            margin: 0 0 10px;
+        }
+        .post p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔥 Scary Stories Dashboard 🔥</h1>
+    <div>
+        <canvas id="chart"></canvas>
+    </div>
+
+    <h2>🕵️ Filtered Posts</h2>
+    <div class="post-container">
+        {% for post in posts %}
+        <div class="post">
+            <h3>{{ post['title'] }}</h3>
+            <p><strong>Upvotes:</strong> {{ post['upvotes'] }}</p>
+            <p><strong>Polarity:</strong> {{ post['polarity'] }}</p>
+            <p><a href="{{ post['url'] }}" target="_blank">🔗 View Post</a></p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        const ctx = document.getElementById('chart').getContext('2d');
+
+        const labels = {{ posts | map(attribute='title') | list | tojson }};
+        const upvotes = {{ posts | map(attribute='upvotes') | list | tojson }};
+        const polarity = {{ posts | map(attribute='polarity') | list | tojson }};
+
+        const data = {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Upvotes',
+                    data: upvotes,
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Polarity',
+                    data: polarity,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }
+            ]
+        };
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
