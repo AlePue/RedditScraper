@@ -2,6 +2,8 @@ import praw
 from textblob import TextBlob
 from datetime import datetime
 from pymongo import MongoClient
+from tts_integration import synthesize_speech
+
 
 # Reddit API Credentials
 reddit = praw.Reddit(
@@ -21,6 +23,9 @@ def get_db():
 def get_top_posts(subreddit_name, limit=5):
     subreddit = reddit.subreddit(subreddit_name)
     top_posts = []
+
+    # if not os.path.exists("audio"):
+    #     os.makedirs("audio")
     
     for post in subreddit.top(limit=limit):
         polarity = TextBlob(post.selftext).sentiment.polarity
@@ -34,6 +39,14 @@ def get_top_posts(subreddit_name, limit=5):
             'timestamp': datetime.now().isoformat()
         }
         top_posts.append(post_data)
+
+        # Generate and save audio file for each post's content
+        post_text = f"Title: {post.title}. Description: {post.selftext}"
+        
+        # Use post title to generate the audio filename, sanitizing the title
+        file_name = post.title[:50].replace(" ", "_").replace("/", "_") + ".mp3"
+        synthesize_speech(post_text, f"audio/{file_name}")
+
     
     return top_posts
 
