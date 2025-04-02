@@ -19,6 +19,7 @@ def fetch_data():
         posts.append({
             'title': doc.get('title', 'No title'),   # Default to 'No title' if missing
             'upvotes': doc.get('upvotes', 0),         # Default to 0 if missing
+            'content': doc.get('content', 'No Content'),         # Default to 'No Content if missing'
             'polarity': doc.get('polarity', 0.0),     # Default to 0.0 if missing
             'url': doc.get('url', '#')                # Default URL
         })
